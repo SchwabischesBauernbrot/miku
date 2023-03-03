@@ -14,6 +14,8 @@ import open from 'open';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
+const chatUrl = process.env.CHAT_ENDPOINT || 'http://localhost:5173';
+
 const app = express();
 app.use('/public', express.static(process.cwd() + '/public'));
 app.set('view engine', 'ejs');
@@ -38,7 +40,7 @@ app.get('/', (req, res) => {
       };
     }));
 
-    res.render('index', {bots: files});
+    res.render('index', {bots: files, chatUrl: chatUrl});
   });
 });
 
