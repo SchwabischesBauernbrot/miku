@@ -11,7 +11,9 @@ export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
 export default function BotLoadingModal(): JSX.Element {
   const { botHash, loading, setBotHash } = useBot();
   const searchParams = queryString.parse(location.search);
-  const [apiKeyForm, setApiKeyForm] = useState<{[key: string]: string}>({openai: '', elevenLabs: '', azure: '', novelai: ''});
+  const [apiKeyForm, setApiKeyForm] = useState<{[key: string]: string}>({
+    openai: '', elevenLabs: '', azure: '', novelai: '', kobold: ''
+  });
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const submitAPIKey = (e: FormEvent) => {
@@ -55,9 +57,17 @@ export default function BotLoadingModal(): JSX.Element {
                 />                
                 <Disclosure>
                   <Disclosure.Button className="py-2 text-gray-300 italic">
-                    (optional) Do you have an API key for 11Labs or Azure?
+                    (optional) Do you have a Kobold Endpoint (Pygmalion) or a TTS API key for 11Labs or Azure?
                   </Disclosure.Button>
                   <Disclosure.Panel className="text-gray-500">
+                    <input
+                      type="text"
+                      className="w-full border-2 border-gray-300 p-2 rounded-md m-1 bg-gray-100 text-black"
+                      name="kobold"
+                      placeholder="Kobold Endpoint..."
+                      value={apiKeyForm.kobold}
+                      onChange={(e) => setApiKeyForm(current => ({...current, kobold: e.target.value}))}
+                    />
                     <input
                       type="text"
                       className="w-full border-2 border-gray-300 p-2 rounded-md m-1 bg-gray-100 text-black"
@@ -101,10 +111,6 @@ export default function BotLoadingModal(): JSX.Element {
 
   if (!botHash) {
     const onBotSelect = (botHash: string) => {
-      // const searchParams = queryString.parse(location.search);
-      // const newSearchParams = {...searchParams, botHash};
-      // const newSearchString = queryString.stringify(newSearchParams);
-      // window.location.search = newSearchString;
       setBotHash(botHash);
       forceUpdate();
     }
@@ -133,7 +139,7 @@ export default function BotLoadingModal(): JSX.Element {
                 <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">GPT3.5-T</span>
               </button>
               <button
-                disabled={IS_ALPHA_LIVE}
+                disabled={IS_ALPHA_LIVE && !searchParams.kobold}
                 className="flex flex-col w-full items-center pb-10 bg-gray-800 p-9 rounded-lg hover:bg-gray-700 hover:shadow-xl select-none transition-all disabled:blur-sm disabled:hover:bg-gray-800 disabled:hover:shadow-none"
                 onClick={onBotSelect.bind(null, ELAINA_BOT)}
               >
@@ -142,7 +148,7 @@ export default function BotLoadingModal(): JSX.Element {
                 <span className="text-sm text-gray-100 bg-blue-600 py-1 px-2 mt-4 rounded-lg">Pygmalion</span>
               </button>
             </div>
-            {IS_ALPHA_LIVE ? (
+            {IS_ALPHA_LIVE && !searchParams.kobold ? (
                 <div className="mt-5 text-gray-300 italic max-w-xs">
                   Elaina is disabled for alpha.miku.gg because there&apos;s no Pygmalion cloud service.
                   Please use Miku instead or run the project locally.

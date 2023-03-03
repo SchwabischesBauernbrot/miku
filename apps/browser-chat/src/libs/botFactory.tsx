@@ -74,7 +74,10 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.Pygmalion:
         chatPromptCompleter = new MikuExtensions.ChatPromptCompleters.PygmalionPromptCompleter({
           serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
-          props: props,
+          props: {
+            ...props,
+            kobold_endpoint: String(searchParams['kobold'] || '') || ''
+          },
           signer: signer,
           memory: memory,
         });

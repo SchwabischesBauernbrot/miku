@@ -10,6 +10,7 @@ export interface PygmalionServiceConfig extends Miku.Services.ServiceConfig {
 
 export const PygmalionServicePropTypes = {
   "model": PropTypes.oneOf(pygmalionModels),
+  "kobold_endpoint": PropTypes.string,
   "prompt": PropTypes.string
 }
 
@@ -18,6 +19,7 @@ export class PygmalionService extends Miku.Services.Service {
   private koboldEndpoint: string;
   protected defaultProps: InferProps<typeof PygmalionServicePropTypes>  = {
     "model": 'pygmalion-6b',
+    "kobold_endpoint": '',
     "prompt": ''
   };
 
@@ -34,7 +36,8 @@ export class PygmalionService extends Miku.Services.Service {
   protected async computeInput(input: InferProps<typeof this.propTypesRequired>): Promise<string> {
     const modelSettings = getPygmalionModelSettings(input.model);
     if (!modelSettings) return '';
-    const completion = await axios.post<{results: {text: string}[]}>(`${this.koboldEndpoint}/v1/generate`, {
+    const koboldEndpoint = input.kobold_endpoint || this.koboldEndpoint;
+    const completion = await axios.post<{results: {text: string}[]}>(`${koboldEndpoint}/v1/generate`, {
       "use_story": false,
       "use_memory": false,
       "use_authors_note": false,
